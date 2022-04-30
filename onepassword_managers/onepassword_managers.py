@@ -103,6 +103,12 @@ def get_vault_groups(vault):
 
 def main():
     """Gets and prints all of the managers of groups with access to the provided vault"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("vault", type=str, help="Name of vault to get managers from")
+    parser.add_argument("-c", "--csv", action="store_true", dest="csv")
+
+    args = parser.parse_args()
+
     groups = []
     vault_groups = get_vault_groups(args.vault)
     for vault_group in vault_groups:
@@ -119,10 +125,5 @@ def main():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("vault", type=str, help="Name of vault to get managers from")
-    parser.add_argument("-c", "--csv", action="store_true", dest="csv")
-
-    args = parser.parse_args()
 
     main()
