@@ -10,6 +10,7 @@ Functions:
     get_vault_groups(string) -> list
 """
 
+import sys
 import subprocess
 import json
 import argparse
@@ -46,10 +47,25 @@ class Group:
         self.group_name = group_name
         self.managers = []
 
-    def get_managers(self):
+    def get_managers(self, account):
         """Appends the name and email addresses of the groups managers to the managers variable"""
         cmd = ["op", "--format", "json", "group", "user", "list", self.group_name]
+        if account:
+            cmd = [
+                "op",
+                "--format",
+                "json",
+                "--account",
+                account,
+                "group",
+                "user",
+                "list",
+                self.group_name,
+            ]
         data = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if data.stderr:
+            print(data.stderr, end="")
+            sys.exit(1)
         data = json.loads(data.stdout)
         for user in data:
             role = user.get("role")
@@ -127,7 +143,7 @@ def main():
     for vault_group in vault_groups:
         groups.append(Group(vault_group))
     for group in groups:
-        group.get_managers()
+        group.get_managers(args.account)
     if args.csv:
         print("group,name,email")
         for group in groups:
