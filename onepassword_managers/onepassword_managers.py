@@ -14,7 +14,7 @@ import subprocess
 import json
 import argparse
 
-from classes.classes import Group
+from classes.classes import Group  # pylint: disable=import-error
 
 
 def get_vault_groups(vault):
