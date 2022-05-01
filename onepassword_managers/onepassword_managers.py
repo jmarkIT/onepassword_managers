@@ -105,7 +105,20 @@ def main():
     """Gets and prints all of the managers of groups with access to the provided vault"""
     parser = argparse.ArgumentParser()
     parser.add_argument("vault", type=str, help="Name of vault to get managers from")
-    parser.add_argument("-c", "--csv", action="store_true", dest="csv")
+    parser.add_argument(
+        "-a",
+        "--account",
+        type=str,
+        help="Shortname of your 1Password account",
+        dest="account",
+    )
+    parser.add_argument(
+        "-c",
+        "--csv",
+        action="store_true",
+        help="Set this flag to print output in csv format.",
+        dest="csv",
+    )
 
     args = parser.parse_args()
 
