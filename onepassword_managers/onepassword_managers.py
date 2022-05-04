@@ -16,7 +16,6 @@ import argparse
 
 from classes.classes import Group  # pylint: disable=import-error
 
-
 def get_vault_groups(vault):
     """
     Collects and returns all of the groups that have access to the provided group
