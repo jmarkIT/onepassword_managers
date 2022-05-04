@@ -54,13 +54,16 @@ class Group:
             print(data.stderr, end="")
             sys.exit(1)
         data = json.loads(data.stdout)
-        for user in data:
-            role = user.get("role")
-            name = user.get("name")
-            email = user.get("email")
-            state = user.get("state")
-            if role == "MANAGER" and state == "ACTIVE":
-                self.managers.append([name, email])
+        try:
+            for user in data:
+                role = user.get("role")
+                name = user.get("name")
+                email = user.get("email")
+                state = user.get("state")
+                if role == "MANAGER" and state == "ACTIVE":
+                    self.managers.append([name, email])
+        except TypeError:
+            return
 
     def print_managers(self):
         """Prints the name of the group followed by the name and email of each manager"""
