@@ -67,6 +67,8 @@ class Group:
             print(data.stderr, end="")
             sys.exit(1)
         data = json.loads(data.stdout)
+        if data == "null":
+            return
         for user in data:
             role = user.get("role")
             name = user.get("name")
