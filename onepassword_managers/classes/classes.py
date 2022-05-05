@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import sys
 import subprocess
 import json
@@ -32,7 +33,43 @@ class Group:
 
     def __init__(self, group_name):
         self.group_name = group_name
+        self.members = []
         self.managers = []
+
+    def get_members(self, account):
+        """Appends the name and email addresses of the groups managers to the managers variable"""
+        cmd = ["op", "--format", "json", "group", "user", "list", self.group_name]
+        if account:
+            cmd = [
+                "op",
+                "--format",
+                "json",
+                "--account",
+                account,
+                "group",
+                "user",
+                "list",
+                self.group_name,
+            ]
+        data = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if data.stderr:
+            print(data.stderr, end="")
+            sys.exit(1)
+        data = json.loads(data.stdout)
+        try:
+            for user in data:
+                user = Group_Member(
+                    user.get("id"),
+                    user.get("name"),
+                    user.get("email"),
+                    user.get("type"),
+                    user.get("state"),
+                    user.get("role"),
+                )
+
+                self.members.append(user)
+        except TypeError:
+            return
 
     def get_managers(self, account):
         """Appends the name and email addresses of the groups managers to the managers variable"""
@@ -81,3 +118,13 @@ class Group:
         else:
             for manager in self.managers:
                 print(f"{self.group_name},{manager[0]},{manager[1]}")
+
+
+@dataclass
+class Group_Member:
+    op_id: str
+    name: str
+    email: str
+    op_type: str
+    state: str
+    role: str
