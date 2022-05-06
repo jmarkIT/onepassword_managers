@@ -36,7 +36,7 @@ class Group:
         self.members = []
         self.managers = []
 
-    def get_members(self, account):
+    def set_members(self, account):
         """Appends the name and email addresses of the groups managers to the managers variable"""
         cmd = ["op", "--format", "json", "group", "user", "list", self.group_name]
         if account:
@@ -71,36 +71,10 @@ class Group:
         except TypeError:
             return
 
-    def get_managers(self, account):
-        """Appends the name and email addresses of the groups managers to the managers variable"""
-        cmd = ["op", "--format", "json", "group", "user", "list", self.group_name]
-        if account:
-            cmd = [
-                "op",
-                "--format",
-                "json",
-                "--account",
-                account,
-                "group",
-                "user",
-                "list",
-                self.group_name,
-            ]
-        data = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        if data.stderr:
-            print(data.stderr, end="")
-            sys.exit(1)
-        data = json.loads(data.stdout)
-        try:
-            for user in data:
-                role = user.get("role")
-                name = user.get("name")
-                email = user.get("email")
-                state = user.get("state")
-                if role == "MANAGER" and state == "ACTIVE":
-                    self.managers.append([name, email])
-        except TypeError:
-            return
+    def set_managers(self):
+        for member in self.members:
+            if member.role == "MANAGER":
+                self.managers.append(member)
 
     def print_managers(self):
         """Prints the name of the group followed by the name and email of each manager"""
@@ -108,7 +82,7 @@ class Group:
         if not self.managers:
             print("No managers for this group")
         for manager in self.managers:
-            print(f"{manager[0]}, {manager[1]}")
+            print(f"{manager.name}, {manager.email}")
         print("")
 
     def print_for_csv(self):

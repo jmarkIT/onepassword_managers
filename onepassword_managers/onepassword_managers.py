@@ -16,6 +16,7 @@ import argparse
 
 from classes.classes import Group  # pylint: disable=import-error
 
+
 def get_vault_groups(vault):
     """
     Collects and returns all of the groups that have access to the provided group
@@ -66,7 +67,8 @@ def main():
     for vault_group in vault_groups:
         groups.append(Group(vault_group))
     for group in groups:
-        group.get_managers(args.account)
+        group.set_members(args.account)
+        group.set_managers()
     if args.csv:
         print("group,name,email")
         for group in groups:
