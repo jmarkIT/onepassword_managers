@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import sys
 import subprocess
 import json
@@ -32,9 +33,10 @@ class Group:
 
     def __init__(self, group_name):
         self.group_name = group_name
+        self.members = []
         self.managers = []
 
-    def get_managers(self, account):
+    def set_members(self, account):
         """Appends the name and email addresses of the groups managers to the managers variable"""
         cmd = ["op", "--format", "json", "group", "user", "list", self.group_name]
         if account:
@@ -56,14 +58,23 @@ class Group:
         data = json.loads(data.stdout)
         try:
             for user in data:
-                role = user.get("role")
-                name = user.get("name")
-                email = user.get("email")
-                state = user.get("state")
-                if role == "MANAGER" and state == "ACTIVE":
-                    self.managers.append([name, email])
+                user = Group_Member(
+                    user.get("id"),
+                    user.get("name"),
+                    user.get("email"),
+                    user.get("type"),
+                    user.get("state"),
+                    user.get("role"),
+                )
+
+                self.members.append(user)
         except TypeError:
             return
+
+    def set_managers(self):
+        for member in self.members:
+            if member.role == "MANAGER":
+                self.managers.append(member)
 
     def print_managers(self):
         """Prints the name of the group followed by the name and email of each manager"""
@@ -71,7 +82,7 @@ class Group:
         if not self.managers:
             print("No managers for this group")
         for manager in self.managers:
-            print(f"{manager[0]}, {manager[1]}")
+            print(f"{manager.name}, {manager.email}")
         print("")
 
     def print_for_csv(self):
@@ -81,3 +92,13 @@ class Group:
         else:
             for manager in self.managers:
                 print(f"{self.group_name},{manager[0]},{manager[1]}")
+
+
+@dataclass
+class Group_Member:
+    op_id: str
+    name: str
+    email: str
+    op_type: str
+    state: str
+    role: str
